@@ -1,29 +1,38 @@
 const express = require('express');
 const mongoose = require('mongoose');
+require('dotenv').config();
+const noteRoutes = require('./routes/NoteRoutes'); // 👈 Adjust the path if needed
 
-// TODO - Update your mongoDB Atals Url here to Connect to the database
-const DB_URL = process.env.DB_URL || "mongodb+srv://comp3123_penny:<db_password>@comp3123assignment1.e1ws7br.mongodb.net/";
+
+const DB_URL = process.env.DB_URL;
 const PORT = process.env.PORT || 8081;
 
 const app = express();
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+// Middleware to parse JSON bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Mount the note routes
+app.use('/api', noteRoutes);
+
+// Root endpoint
 app.get('/', (req, res) => {
     res.send("<h1>Welcome to Note taking application - Week06 Exercise</h1>");
 });
 
-// Connect to the database
+// Connect to MongoDB Atlas
 mongoose.connect(DB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-}).then(() => {
-    console.log("Successfully connected to the database mongoDB Atlas Server");    
+})
+.then(() => {
+    console.log("✅ Successfully connected to the MongoDB Atlas database");
     app.listen(PORT, () => {
-    console.log("Server is listening on port 3000");
-});
-}).catch(err => {
-    console.log('Could not connect to the database. Exiting now...', err);
+        console.log(`🚀 Server is listening on port ${PORT}`);
+    });
+})
+.catch(err => {
+    console.error('❌ Could not connect to the database. Exiting now...', err);
     process.exit();
 });
